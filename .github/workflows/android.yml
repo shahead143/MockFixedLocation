@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,8 +21,10 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+      - name: Accept SDK licenses & install platforms/build-tools
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Download Gradle 8.6 and generate wrapper
         run: |
@@ -31,10 +32,9 @@ jobs:
           unzip -q gradle.zip
           ./gradle-8.6/bin/gradle wrapper
           chmod +x gradlew
-          ./gradlew --version
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace --info
+        run: ./gradlew :app:assembleDebug --stacktrace --info
 
       - name: Upload APK
         if: always()
