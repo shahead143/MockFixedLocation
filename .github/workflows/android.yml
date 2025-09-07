@@ -2,32 +2,29 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
+      - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Gradle 8.6 and generate wrapper
+      - name: Gradle wrapper
         run: |
-          curl -sLo gradle.zip https://services.gradle.org/distributions/gradle-8.6-bin.zip
-          unzip -q gradle.zip
-          ./gradle-8.6/bin/gradle wrapper
-
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+          gradle wrapper
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
